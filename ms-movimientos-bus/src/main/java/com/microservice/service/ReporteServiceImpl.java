@@ -33,7 +33,6 @@ public class ReporteServiceImpl implements ReporteService{
             detalleMovimientos.put(cuenta, movimientos);
         }
 
-        // Crear y retornar el objeto de reporte
         ReporteEstadoCuenta reporte = new ReporteEstadoCuenta();
         reporte.setCuentas(cuentas);
         reporte.setDetalleMovimientos(detalleMovimientos);

@@ -1,7 +1,6 @@
 package com.microservice.controller;
 
 import com.microservice.constants.Constantes;
-import com.microservice.model.Cuenta;
 import com.microservice.model.Movimiento;
 import com.microservice.model.request.RequestApi;
 import com.microservice.model.response.ResponseApi;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 
 @AllArgsConstructor
 @RestController

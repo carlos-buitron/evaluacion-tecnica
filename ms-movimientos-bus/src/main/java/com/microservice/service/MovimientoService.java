@@ -3,6 +3,7 @@ package com.microservice.service;
 import com.microservice.dto.MovimientoDto;
 import com.microservice.model.Movimiento;
 import com.microservice.model.response.ResponseApi;
+import com.microservice.model.response.ResponseMovimiento;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ public interface MovimientoService {
     Movimiento obtenerMovimientoPorId(Long id);
     Movimiento crearMovimiento(Movimiento movimiento);
     Movimiento actualizarMovimiento(Long id, Movimiento movimiento);
-    boolean eliminarMovimiento(Long id);
     ResponseApi realizarMovimiento(MovimientoDto movimiento);
+    ResponseMovimiento delete(Long id);
+
 }

@@ -25,9 +25,8 @@ public class ReporteRestController {
             @RequestParam("fechaFin") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin,
             @RequestParam("clienteId") Long clienteId) {
 
-        // Generar el reporte utilizando el servicio de reportes
         ReporteEstadoCuenta reporte = reporteService.generarReporteEstadoCuenta(fechaInicio, fechaFin, clienteId);
 
-        return ResponseEntity.ok(reporte); // Retornar el reporte en formato JSON
+        return ResponseEntity.ok(reporte);
     }
 }

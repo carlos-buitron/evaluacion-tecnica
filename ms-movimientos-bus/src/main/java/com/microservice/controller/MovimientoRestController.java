@@ -4,7 +4,9 @@ import com.microservice.constants.Constantes;
 import com.microservice.dto.MovimientoDto;
 import com.microservice.model.Movimiento;
 import com.microservice.model.response.ResponseApi;
+import com.microservice.model.response.ResponseMovimiento;
 import com.microservice.service.MovimientoService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +33,7 @@ public class MovimientoRestController {
         return movimientoService.obtenerTodosLosMovimientos();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("get/{id}")
     public ResponseEntity<Movimiento> obtenerMovimientoPorId(@PathVariable Long id) {
         Movimiento movimiento = movimientoService.obtenerMovimientoPorId(id);
         if (movimiento != null) {
@@ -46,7 +48,7 @@ public class MovimientoRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoMovimiento);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("update/{id}")
     public ResponseEntity<Movimiento> actualizarMovimiento(@PathVariable Long id, @RequestBody Movimiento movimiento) {
         Movimiento movimientoActualizado = movimientoService.actualizarMovimiento(id, movimiento);
         if (movimientoActualizado != null) {
@@ -55,12 +57,17 @@ public class MovimientoRestController {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarMovimiento(@PathVariable Long id) {
-        if (movimientoService.eliminarMovimiento(id)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+
+    @DeleteMapping(path = "delete/{id}", produces = {"application/json;charset=UTF-8"})
+    public ResponseEntity<ResponseApi> eliminarMovimiento(@Valid @PathVariable(name = "id") Long id){
+        ResponseMovimiento resultado = movimientoService.delete(id);
+        return new ResponseEntity<>(
+                ResponseApi.builder()
+                        .mensaje(Constantes.SUCCESS_OPERATION)
+                        .resultado(resultado)
+                        .build(),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping("/realizar")

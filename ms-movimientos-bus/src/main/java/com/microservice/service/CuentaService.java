@@ -9,14 +9,10 @@ import java.util.List;
 
 public interface CuentaService {
 
-    List<Cuenta> obtenerTodasLasCuentas();
     Cuenta obtenerCuentaPorId(Long id);
-    Cuenta actualizarCuenta(Long id, Cuenta cuenta);
-    boolean eliminarCuenta(Long id);
     ResponseCuenta create(RequestApi request);
     ResponseCuenta update(RequestApi request);
     ResponseCuenta update(Long id, RequestApi requestApi);
-    ResponseCuenta delete(String numeroCuenta);
     ResponseCuenta delete(Long id);
     ResponseCuenta get(String numeroCuenta);
 

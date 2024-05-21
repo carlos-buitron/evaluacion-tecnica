@@ -29,28 +29,8 @@ public class CuentaServiceImpl implements CuentaService {
     MovimientoRepository movimientoRepository;
     ClienteComponent clienteComponent;
 
-    public List<Cuenta> obtenerTodasLasCuentas() {
-        return cuentaRepository.findAll();
-    }
-
     public Cuenta obtenerCuentaPorId(Long id) {
         return cuentaRepository.findById(id).orElse(null);
-    }
-
-    public Cuenta actualizarCuenta(Long id, Cuenta cuenta) {
-        if (cuentaRepository.existsById(id)) {
-            cuenta.setId(id);
-            return cuentaRepository.save(cuenta);
-        }
-        return cuentaRepository.save(cuenta);
-    }
-
-    public boolean eliminarCuenta(Long id) {
-        if (cuentaRepository.existsById(id)) {
-            cuentaRepository.deleteById(id);
-            return true;
-        }
-        return false;
     }
 
     @Transactional
@@ -85,11 +65,6 @@ public class CuentaServiceImpl implements CuentaService {
         }
         cuentaRepository.save(cuenta);
         return ResponseCuentaMapper.buildResponseCuenta(cuenta);
-    }
-
-    @Override
-    public ResponseCuenta delete(String numeroCuenta) {
-        return null;
     }
 
     @Override

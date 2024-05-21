@@ -30,7 +30,10 @@ public class MovimientoServiceImpl implements MovimientoService {
     }
 
     public Movimiento obtenerMovimientoPorId(Long id) {
-        return movimientoRepository.findById(id).orElse(null);
+        return movimientoRepository.findById(id)
+                .orElseThrow(() -> {
+                    throw new ApiException(String.format("No existe el movimiento con ID %s", String.valueOf(id)));
+                });
     }
 
     public Movimiento crearMovimiento(Movimiento movimiento) {
@@ -91,4 +94,26 @@ public class MovimientoServiceImpl implements MovimientoService {
                 .resultado(responseMovimiento)
                 .build();
     }
+
+    @Override
+    public ResponseMovimiento delete(Long id) {
+        eliminadaMovimiento(id);
+        return ResponseMovimiento.builder().build();
+    }
+
+    private void eliminadaMovimiento(Long id){
+        Movimiento movimiento = movimientoRepository.findById(id)
+                .orElseThrow(() -> {
+                    throw new ApiException(String.format("No existe un movimiento registrado con %s", id));
+                });
+        movimientoRepository.delete(movimiento);
+    }
+
+    private Movimiento getMovimiento(Long id){
+        return movimientoRepository.findById(id)
+                .orElseThrow(() -> {
+                    throw new ApiException(String.format("No existe la cuenta con ID %s", String.valueOf(id)));
+                });
+    }
+
 }

@@ -1,0 +1,64 @@
+version: '3.9'
+
+services:
+  product:
+    container_name: product
+    image: microservice/product
+    build: ./ms-client-service
+    mem_limit: 512M
+    depends_on:
+      - mysql
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sistema?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - springmysql
+
+  review:
+    container_name: review
+    image: microservice/review
+    build: ./ms-movimientos-bus
+    mem_limit: 512M
+    depends_on:
+      - mysql
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/sistema?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - springmysql
+
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    mem_limit: 512M
+    volumes:
+      - sqldata:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_USER=joice
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=sistema
+    networks:
+      - springmysql
+    healthcheck:
+      test: "mysql -u root -p$$MYSQL_ROOT_PASSWORD  -e 'SHOW DATABASES'"
+      interval: 5s
+      timeout: 2s
+      retries: 60
+
+volumes:
+  sqldata:
+
+networks:
+   springmysql:
+     name: springmysql

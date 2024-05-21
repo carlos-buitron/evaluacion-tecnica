@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/database?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+    username: root
+    password: secret
+
+uri:
+  basePath:  http://localhost:8081/api/v1/clientes
+  endpoints:
+    obtenerClienteIdentificacion: ${uri.basePath}/get/{{identificacion}}/informacion
+    obtenerClienteId: ${uri.basePath}/get/{{id}}/id
+

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @AllArgsConstructor
@@ -59,36 +60,42 @@ public class MovimientoServiceImpl implements MovimientoService {
     // Historico de Movimientos
     public ResponseApi realizarMovimiento(MovimientoDto movimientoDto) {
         BigDecimal operacion = null;
-        Cuenta cuenta = cuentaService.obtenerCuentaPorId(movimientoDto.getCuentaId());
-        Movimiento movimiento = movimientoRepository.findByCuenta(cuenta);
-        if (movimiento.getSaldoActual().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ApiException("Saldo no disponible");
-        }
-        if (movimientoDto.getValor().compareTo(BigDecimal.ZERO) < 0) {
-            System.out.println(movimientoDto.getValor().abs());
-            if(movimiento.getSaldoActual().compareTo(movimientoDto.getValor().abs()) < 0) {
+        Optional<Cuenta> cuentaOpt = cuentaRepository.findById(movimientoDto.getCuentaId());
+        Cuenta cuenta = null;
+        ResponseMovimiento responseMovimiento = null;
+        if(cuentaOpt.isPresent()) {
+            cuenta = cuentaOpt.get();
+            List<Movimiento> movimientos = movimientoRepository.findByCuenta(cuenta);
+            int cantidadMovimientos = movimientos.size();
+            Movimiento movimiento = movimientos.get(cantidadMovimientos -1);
+            if (movimiento.getSaldoActual().compareTo(BigDecimal.ZERO) <= 0) {
                 throw new ApiException("Saldo no disponible");
             }
+            if (movimientoDto.getValor().compareTo(BigDecimal.ZERO) < 0) {
+                System.out.println(movimientoDto.getValor().abs());
+                if(movimiento.getSaldoActual().compareTo(movimientoDto.getValor().abs()) < 0) {
+                    throw new ApiException("Saldo no disponible");
+                }
+            }
+
+            operacion = movimiento.getSaldoActual().add(movimientoDto.getValor());
+            // Actualizar movimientos
+            movimiento.setTipoMovimiento(movimientoDto.getTipoMovimiento());
+            movimiento.setFecha(LocalDateTime.now());
+            movimiento.setCuenta(cuenta);
+            movimiento.setValor(movimientoDto.getValor());
+            movimiento.setSaldoActual(operacion);
+            movimientoRepository.save(movimiento);
+
+            cuentaOpt.get().setSaldoInicial(movimiento.getSaldoActual());
+            cuentaRepository.save(cuentaOpt.get());
+            responseMovimiento = ResponseMovimiento.builder()
+                    .saldoActual(cuenta.getSaldoInicial())
+                    .tipoMovimiento(movimiento.getTipoMovimiento())
+                    .fecha(movimiento.getFecha())
+                    .cuentaId(cuenta.getId())
+                    .build();
         }
-        operacion = movimiento.getSaldoActual().add(movimientoDto.getValor());
-        // Actualizar movimientos
-
-        movimiento.setTipoMovimiento(movimientoDto.getTipoMovimiento());
-        movimiento.setFecha(LocalDateTime.now());
-        movimiento.setCuenta(cuenta);
-        movimiento.setValor(movimientoDto.getValor());
-        movimiento.setSaldoActual(operacion);
-        movimientoRepository.save(movimiento);
-
-        cuenta.setSaldoInicial(movimiento.getSaldoActual());
-        cuentaRepository.save(cuenta);
-
-        ResponseMovimiento responseMovimiento = ResponseMovimiento.builder()
-                .saldoActual(cuenta.getSaldoInicial())
-                .tipoMovimiento(movimiento.getTipoMovimiento())
-                .fecha(movimiento.getFecha())
-                .cuentaId(cuenta.getId())
-                .build();
         return ResponseApi.builder()
                 .mensaje("Operación Exitosa")
                 .resultado(responseMovimiento)

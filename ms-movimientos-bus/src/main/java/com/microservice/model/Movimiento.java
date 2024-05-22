@@ -40,7 +40,7 @@ public class Movimiento {
     @Column(name = "saldo_actual", nullable = false)
     private BigDecimal saldoActual;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cuenta_id", nullable = false)
     private Cuenta cuenta;
 }

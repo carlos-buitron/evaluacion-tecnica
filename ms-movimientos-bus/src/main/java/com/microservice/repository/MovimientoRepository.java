@@ -13,5 +13,8 @@ public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
     @Query("SELECT m FROM Movimiento m WHERE m.cuenta.id = :cuentaId AND m.fecha BETWEEN :fechaInicio AND :fechaFin")
     List<Movimiento> findByCuentaIdAndFechaBetween(Long cuentaId, LocalDateTime fechaInicio, LocalDateTime fechaFin);
 
-    Movimiento findByCuenta(Cuenta cuenta);
+    @Query("SELECT m FROM Movimiento m WHERE m.cuenta.id = :id")
+    Movimiento findByCuentaId(Long id);
+
+    List<Movimiento> findByCuenta(Cuenta cuenta);
 }

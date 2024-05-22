@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @AllArgsConstructor
@@ -36,8 +37,24 @@ public class CuentaServiceImpl implements CuentaService {
     @Transactional
     @Override
     public ResponseCuenta create(RequestApi request) {
+        Optional<Cuenta> cuentaOpt = cuentaRepository.findByNumeroCuenta(request.getNumeroCuenta());
+        Movimiento movimiento = null;
+        Cuenta cuenta = null;
         ClienteDto cliente = clienteComponent.getCliente(request.getClienteId());
-        Cuenta cuenta = cuentaRepository.save(CuentaMapper.buildCuenta(request, cliente));
+        if(!cuentaOpt.isPresent()) {
+            cuenta = cuentaRepository.save(CuentaMapper.buildCuenta(request, cliente));
+            if(request.getSaldoInicial().compareTo(BigDecimal.ZERO) > 0) {
+                movimiento = new Movimiento();
+                movimiento.setCuenta(cuenta);
+                movimiento.setSaldoActual(request.getSaldoInicial());
+                movimiento.setValor(BigDecimal.ZERO);
+                movimiento.setTipoMovimiento("Aporte");
+                movimiento.setFecha(LocalDateTime.now());
+                movimientoRepository.save(movimiento);
+            }
+        } else {
+            throw new ApiException("Cuenta ya existe");
+        }
         return ResponseCuentaMapper.buildResponseCuenta(cuenta);
     }
 
